@@ -1,0 +1,28 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "announcements": {
+      ".read": true,
+      "$id": {
+        ".write": "auth != null && auth.uid === 'LBRaxtFe2kg6tbke5adJqgLxKzZ2'",
+        ".validate": "newData.hasChildren(['title','body','priority','target','createdAt','updatedAt','expiresAt'])",
+        "title": { ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 100" },
+        "body": { ".validate": "newData.isString() && newData.val().length <= 1500" },
+        "priority": { ".validate": "newData.val() === 'info' || newData.val() === 'important'" },
+        "target": { ".validate": "newData.isString() && newData.val().length <= 160" },
+        "createdAt": { ".validate": "newData.isNumber()" },
+        "updatedAt": { ".validate": "newData.isNumber()" },
+        "expiresAt": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "$other": { ".validate": false }
+      }
+    },
+    "notificationReads": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= now + 60000"
+      }
+    }
+  }
+}

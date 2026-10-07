@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function admin() { return request.auth != null && request.auth.uid == 'LBRaxtFe2kg6tbke5adJqgLxKzZ2'; }
+    function text(value, max) { return value is string && value.size() <= max; }
+    match /profiles/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || admin());
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['uid','email','displayName','institution','grade','phone','bio','interests','updatedAt'])
+        && request.resource.data.uid == uid && request.resource.data.email == request.auth.token.email
+        && text(request.resource.data.displayName,80) && request.resource.data.displayName.size() >= 2
+        && text(request.resource.data.institution,120) && text(request.resource.data.grade,60)
+        && text(request.resource.data.phone,30) && text(request.resource.data.bio,600)
+        && text(request.resource.data.interests,180) && request.resource.data.updatedAt == request.time;
+    }
+    match /blogs/{id} {
+      allow read: if resource.data.published == true || admin();
+      allow create, update: if admin()
+        && request.resource.data.keys().hasOnly(['title','category','excerpt','body','cover','author','published','createdAt','updatedAt'])
+        && text(request.resource.data.title,120) && request.resource.data.title.size() >= 3
+        && text(request.resource.data.category,40) && text(request.resource.data.excerpt,300)
+        && text(request.resource.data.body,12000) && request.resource.data.body.size() >= 30
+        && text(request.resource.data.cover,1500) && text(request.resource.data.author,80)
+        && request.resource.data.published is bool && request.resource.data.createdAt is number && request.resource.data.updatedAt is number;
+    }
+    match /support/{id} {
+      allow read: if resource.data.active == true || admin();
+      allow create, update: if admin()
+        && request.resource.data.keys().hasOnly(['name','role','phone','hours','active'])
+        && text(request.resource.data.name,80) && text(request.resource.data.role,120)
+        && text(request.resource.data.phone,30) && text(request.resource.data.hours,120)
+        && request.resource.data.active is bool;
+    }
+    match /settings/{id} { allow read, write: if admin(); }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
