@@ -138,12 +138,12 @@ The following ticket/schedule screenshots illustrate the previous evaluation dat
 
 - Email/Password and the production domain are configured. The owner supplied the admin UID, which is set in the server environment. Database rule publication and real account walkthrough status are tracked in docs/LAUNCH-STATUS.md.
 - Event and registration data stays in D1. Profiles, blogs and support use Firestore; announcements use Realtime Database. No Firebase Storage, Functions or Analytics is initialized. Images are edited using HTTPS URLs or bundled illustration paths.
-- No ticket-confirmation email, payment processing, integrated QR camera scanning, or team registration. Verification and reset emails are handled by Firebase. Use an external QR reader for check-in.
+- No ticket-confirmation email, automatic payment gateway, or integrated QR camera scanning. Paid registrations use organizer Trx ID review; teams register with accepted members. Verification and reset emails are handled by Firebase. Use an external QR reader for check-in.
 - Events and passes demonstrate a club platform; they are not official admission to DRMC events. Seed event dates run October 2026–March 2027; organizers can update them.
 - Shared organizer edits affect all visitors. The old isolated demo workspaces remain inaccessible to new accounts; no personal history is guessed or transferred.
 - The event catalog and counts refresh on window focus and every 15 seconds while visible. Community content uses Firebase subscriptions after database setup.
 - Larger public rollouts should add workload-specific abuse limits, monitoring, backups and data-retention policies. The application currently relies on Firebase's authentication limits and server booking checks.
-- GitHub publication and the official contest form remain separate pending steps; see [submission entry](docs/SUBMISSION.md). A contest score cannot be guaranteed.
+- The public source is published in this repository. Official contest form submission remains pending; see [submission entry](docs/SUBMISSION.md). A contest score cannot be guaranteed.
 
 ## License
 
