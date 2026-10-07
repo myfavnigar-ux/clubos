@@ -149,4 +149,9 @@ The following ticket/schedule screenshots illustrate the previous evaluation dat
 
 MIT. See [LICENSE](LICENSE). Third-party components retain their respective licenses and notices.
 
+The organizing authority reserves the right to make the final decision regarding rule
+interpretation, eligibility, judging, scoring, and any matters not explicitly covered in
+these guidelines. All decisions made by the judging panel and organizing authority
+shall be final.
+
 
