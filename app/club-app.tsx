@@ -28,6 +28,7 @@ import {
   AlertCircle,
   Check,
   Layers,
+  Share2,
   Loader2,
 } from "lucide-react";
 import { EventArtwork, festivalArtwork } from "@/components/event-artwork";
@@ -391,13 +392,36 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
   const selectedEvent = route.startsWith("event/")
     ? data.events.find((e) => e.id === route.slice(6))
     : undefined;
-  const selectedFest = data.fests.find((f) => f.id === festId);
+  const isFestPage = route.startsWith("fest/");
+  const activeFestId = isFestPage ? route.slice(5) : festId;
+  const selectedFest = data.fests.find((f) => f.id === activeFestId);
+  const featuredFest = selectedFest || data.fests[0];
+  const festivalEvents = selectedFest
+    ? data.events.filter((e) => e.festId === selectedFest.id)
+    : [];
+  const openFest = (id: string) => {
+    setQuery("");
+    setCategory("All events");
+    setOpenOnly(false);
+    setFestId("all");
+    go(id === "all" ? "discover" : "fest/" + id);
+  };
+  const sharePage = async () => {
+    try {
+      await navigator.clipboard.writeText(location.href);
+      toast.success("Page link copied. Share it with your friends.");
+    } catch {
+      toast.error(
+        "Copy is unavailable. Copy the page address from your browser.",
+      );
+    }
+  };
   const filtered = useMemo(
     () =>
       data.events
         .filter(
           (e) =>
-            (festId === "all" || e.festId === festId) &&
+            (activeFestId === "all" || e.festId === activeFestId) &&
             (category === "All events" || e.category === category) &&
             (!openOnly ||
               (!e.paused &&
@@ -412,7 +436,16 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
             ? Date.parse(a.deadline) - Date.parse(b.deadline)
             : Date.parse(a.start) - Date.parse(b.start),
         ),
-    [data.events, festId, category, openOnly, clock, counts, query, sortBy],
+    [
+      data.events,
+      activeFestId,
+      category,
+      openOnly,
+      clock,
+      counts,
+      query,
+      sortBy,
+    ],
   );
   const schedule = useMemo(
     () =>
@@ -481,7 +514,15 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                   ? "Admin panel"
                   : selectedEvent
                     ? "Event details"
-                    : "Discover";
+                    : isFestPage
+                      ? "Festival details"
+                      : "Discover";
+  const navRoute =
+    isFestPage || route.startsWith("event/")
+      ? "discover"
+      : route.startsWith("blog/")
+        ? "blogs"
+        : route;
   function card(e: ClubEvent) {
     const status = availability(e);
     return (
@@ -495,7 +536,11 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
           <span className="category">{e.category}</span>
           {status !== "Open" && (
             <span className="availability-tag">
-              {status === "Full" ? "FULL" : "REGISTRATION CLOSED"}
+              {status === "Full"
+                ? "FULL"
+                : status === "Paused"
+                  ? "BOOKING PAUSED"
+                  : "REGISTRATION CLOSED"}
             </span>
           )}
         </button>
@@ -522,16 +567,18 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
               {loading
                 ? "Checking availability…"
                 : status === "Open"
-                  ? `${Math.max(0, e.capacity - counts(e.id))} seats left`
+                  ? `${Math.max(0, e.capacity - counts(e.id))} slots left`
                   : status === "Full"
-                    ? "All seats reserved"
-                    : "Deadline passed"}
+                    ? "All slots reserved"
+                    : status === "Paused"
+                      ? "Booking paused by organizer"
+                      : "Deadline passed"}
             </span>
             <span>{loading ? "—" : counts(e.id) + " / " + e.capacity}</span>
           </div>
           <Progress
             value={(counts(e.id) / e.capacity) * 100}
-            aria-label="Reserved seats"
+            aria-label="Reserved registration slots"
             className="seat-progress"
           />
           <div className="card-footer">
@@ -603,9 +650,9 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                 key={n.id}
                 title={n.label}
                 aria-label={n.label}
-                aria-current={route === n.id ? "page" : undefined}
+                aria-current={navRoute === n.id ? "page" : undefined}
                 className={
-                  (route === n.id ? "active " : "") +
+                  (navRoute === n.id ? "active " : "") +
                   (n.id === "organizer" ? "mobile-admin" : "")
                 }
                 onClick={() => go(n.id)}
@@ -718,17 +765,33 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
               {route === "profile" && <ProfilePage data={data} go={go} />}
               {route === "support" && <SupportPage />}
             </Suspense>
-            {route === "discover" && (
+            {(route === "discover" || (isFestPage && selectedFest)) && (
               <>
+                {isFestPage && (
+                  <nav className="festival-breadcrumb" aria-label="Breadcrumb">
+                    <button className="back" onClick={() => openFest("all")}>
+                      <ChevronLeft size={17} /> All festivals
+                    </button>
+                    <span aria-current="page">{selectedFest?.name}</span>
+                  </nav>
+                )}
                 <div className="page-heading discovery-heading">
                   <div>
-                    <p className="eyebrow">MEET. MAKE. MAKE YOUR MARK.</p>
+                    <p className="eyebrow">
+                      {isFestPage
+                        ? selectedFest?.eyebrow
+                        : "MEET. MAKE. MAKE YOUR MARK."}
+                    </p>
                     <h1>
-                      Find your next big thing<span>.</span>
+                      {isFestPage
+                        ? selectedFest?.name
+                        : "Find your next big thing"}
+                      <span>.</span>
                     </h1>
                     <p>
-                      Discover your people. Pick your challenge. Make something
-                      that matters.
+                      {isFestPage
+                        ? "One festival. Your choice of challenges. Explore the details and reserve your place."
+                        : "Discover your people. Pick your challenge. Make something that matters."}
                     </p>
                   </div>
                   <label className="search">
@@ -743,71 +806,106 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                 </div>
                 <section
                   className={
-                    "festival-feature " + (selectedFest?.color || "green")
+                    "festival-feature " + (featuredFest?.color || "green")
                   }
                   aria-label="Featured festival"
                 >
                   <div className="feature-info">
                     <div className="feature-date">
                       <CalendarDays size={21} />
-                      <strong>{selectedFest?.date || "23–25 OCT 2026"}</strong>
-                      <span>{selectedFest?.venue || "DRMC Campus, Dhaka"}</span>
+                      <strong>
+                        {featuredFest?.date || "Dates to be announced"}
+                      </strong>
+                      <span>{featuredFest?.venue || "DRMC Campus, Dhaka"}</span>
                     </div>
                     <div className="feature-copy">
                       <span className="feature-label">
-                        {selectedFest
+                        {featuredFest
                           ? "IN THE SPOTLIGHT"
                           : "THE FLAGSHIP EXPERIENCE"}
                       </span>
-                      <h2>{selectedFest?.name || "Tech Carnival 2026"}</h2>
+                      <h2>
+                        {featuredFest?.name || "Explore campus festivals"}
+                      </h2>
                       <p>
-                        {selectedFest?.description ||
+                        {featuredFest?.description ||
                           "Three days. Big ideas. Your people. Build, compete, and discover what comes next."}
                       </p>
                     </div>
                     <button
                       className="lime"
                       onClick={() => {
-                        setFestId(selectedFest?.id || "carnival");
-                        setQuery("");
-                        setCategory("All events");
-                        document.getElementById("directory")?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
+                        if (!isFestPage)
+                          openFest(
+                            featuredFest?.id || data.fests[0]?.id || "all",
+                          );
+                        else
+                          document.getElementById("directory")?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
                       }}
                     >
                       Explore events
                     </button>
                   </div>
                   <div className="feature-picture">
-                    {festivalArtwork(selectedFest?.id) ? (
+                    {festivalArtwork(featuredFest?.id) ? (
                       <img
-                        src={`/images/clubos/${festivalArtwork(selectedFest?.id).file}-960.webp`}
-                        srcSet={`/images/clubos/${festivalArtwork(selectedFest?.id).file}-480.webp 480w, /images/clubos/${festivalArtwork(selectedFest?.id).file}-960.webp 960w`}
+                        src={`/images/clubos/${festivalArtwork(featuredFest?.id).file}-960.webp`}
+                        srcSet={`/images/clubos/${festivalArtwork(featuredFest?.id).file}-480.webp 480w, /images/clubos/${festivalArtwork(featuredFest?.id).file}-960.webp 960w`}
                         sizes="(max-width: 800px) 100vw, 38vw"
                         width={960}
                         height={640}
                         fetchPriority="high"
                         decoding="async"
-                        alt={festivalArtwork(selectedFest?.id).description}
+                        alt={festivalArtwork(featuredFest?.id).description}
                       />
                     ) : (
                       <div className="festival-art-placeholder">
                         <CalendarDays size={48} />
-                        <strong>{selectedFest?.name}</strong>
-                        <span>{selectedFest?.date}</span>
+                        <strong>{featuredFest?.name}</strong>
+                        <span>{featuredFest?.date}</span>
                       </div>
                     )}
                   </div>
                 </section>
+                {isFestPage && selectedFest && (
+                  <section
+                    className="festival-facts"
+                    aria-label="Festival at a glance"
+                  >
+                    <div>
+                      <strong>{festivalEvents.length}</strong>
+                      <span>Events to explore</span>
+                    </div>
+                    <div>
+                      <strong>
+                        {loading
+                          ? "…"
+                          : festivalEvents.filter(
+                              (e) => availability(e) === "Open",
+                            ).length}
+                      </strong>
+                      <span>Accepting registrations</span>
+                    </div>
+                    <div>
+                      <strong>
+                        {festivalEvents.filter((e) => e.fee === 0).length}
+                      </strong>
+                      <span>Free experiences</span>
+                    </div>
+                    <button className="secondary" onClick={sharePage}>
+                      <Share2 size={16} /> Share festival
+                    </button>
+                  </section>
+                )}
                 <div className="festival-strip" aria-label="Festival directory">
                   <button
-                    aria-pressed={festId === "all"}
-                    className={festId === "all" ? "chosen" : ""}
+                    aria-pressed={activeFestId === "all"}
+                    className={activeFestId === "all" ? "chosen" : ""}
                     onClick={() => {
-                      setFestId("all");
-                      setCategory("All events");
+                      openFest("all");
                     }}
                   >
                     <Layers size={19} />
@@ -819,11 +917,10 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                   {data.fests.map((f, i) => (
                     <button
                       key={f.id}
-                      aria-pressed={festId === f.id}
-                      className={festId === f.id ? "chosen" : ""}
+                      aria-pressed={activeFestId === f.id}
+                      className={activeFestId === f.id ? "chosen" : ""}
                       onClick={() => {
-                        setFestId(f.id);
-                        setCategory("All events");
+                        openFest(f.id);
                       }}
                     >
                       {festivalArtwork(f.id) ? (
@@ -877,7 +974,9 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                       new Set(
                         data.events
                           .filter(
-                            (e) => festId === "all" || e.festId === festId,
+                            (e) =>
+                              activeFestId === "all" ||
+                              e.festId === activeFestId,
                           )
                           .map((e) => e.category),
                       ),
@@ -937,10 +1036,19 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
             {route.startsWith("event/") &&
               (selectedEvent ? (
                 <>
-                  <button className="back" onClick={() => go("discover")}>
-                    <ChevronLeft size={17} />
-                    Back to events
-                  </button>
+                  <nav className="festival-breadcrumb" aria-label="Breadcrumb">
+                    <button
+                      className="back"
+                      onClick={() => openFest(selectedEvent.festId)}
+                    >
+                      <ChevronLeft size={17} />
+                      {data.fests.find((f) => f.id === selectedEvent.festId)
+                        ?.name || "Festival events"}
+                    </button>
+                    <button className="secondary" onClick={sharePage}>
+                      <Share2 size={16} /> Share event
+                    </button>
+                  </nav>
                   <div className="detail-heading">
                     <p className="eyebrow">
                       {
@@ -1439,7 +1547,8 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
               "teams",
             ].includes(route) &&
               !route.startsWith("event/") &&
-              !route.startsWith("blog/") && (
+              !route.startsWith("blog/") &&
+              !(isFestPage && selectedFest) && (
                 <div className="empty">
                   <h1>Page not found</h1>
                   <button className="primary" onClick={() => go("discover")}>

@@ -155,3 +155,7 @@ these guidelines. All decisions made by the judging panel and organizing authori
 shall be final.
 
 
+
+## Latest contest polish
+
+Festival tiles open reloadable, shareable festival pages with dates, venues, artwork, open-event counts and event lists. Event pages link back to the festival. Admin Overview includes a pending-payment review queue and verified fee totals based on saved booking amounts. Participant search covers teams, members and Trx IDs; CSV includes team/payment details. Existing account verification links remain; custom email OTP and ticket emails are out of scope at the owner's request. See [judge guide](docs/JUDGE-GUIDE.md) for the walkthrough and remaining submission requirements.

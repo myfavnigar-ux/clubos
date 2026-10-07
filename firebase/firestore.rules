@@ -1,7 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function admin() { return request.auth != null && request.auth.uid == 'LBRaxtFe2kg6tbke5adJqgLxKzZ2'; }
+    function admin() { return request.auth != null && request.auth.uid in ['LBRaxtFe2kg6tbke5adJqgLxKzZ2', 'EX6FflXRiWYJeERH0ziyBFM4Ss63']; }
     function text(value, max) { return value is string && value.size() <= max; }
     match /profiles/{uid} {
       allow read: if request.auth != null && (request.auth.uid == uid || admin());

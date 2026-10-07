@@ -125,6 +125,14 @@ export default function OrganizerPanel({
     () => data.registrations.filter((r) => r.status !== "cancelled"),
     [data.registrations],
   );
+  const pendingPayments = active.filter((r) => r.status === "pending_payment");
+  const verifiedAmount = active
+    .filter((r) => r.status === "confirmed" || r.status === "checked_in")
+    .reduce((sum, r) => sum + (r.payment?.amount || 0), 0);
+  const pendingAmount = pendingPayments.reduce(
+    (sum, r) => sum + (r.payment?.amount || 0),
+    0,
+  );
   const chartMax = Math.max(1, ...data.events.map((e) => counts(e.id)));
   const pRows = useMemo(
     () =>
@@ -132,9 +140,18 @@ export default function OrganizerPanel({
         (r) =>
           (pEvent === "all" || r.eventId === pEvent) &&
           (pStatus === "all" || r.status === pStatus) &&
-          (r.name + " " + r.email + " " + r.institution + " " + r.id)
+          [
+            r.name,
+            r.email,
+            r.institution,
+            r.id,
+            r.teamName,
+            r.trxId,
+            ...(r.members || []).map((m) => m.name),
+          ]
+            .join(" ")
             .toLowerCase()
-            .includes(pQuery.toLowerCase()),
+            .includes(pQuery.trim().toLowerCase()),
       ),
     [data.registrations, pEvent, pStatus, pQuery],
   );
@@ -148,15 +165,39 @@ export default function OrganizerPanel({
       r.institution,
       data.events.find((e) => e.id === r.eventId)?.title || "",
       r.status,
+      r.teamName || "",
+      r.teamId ? "Team" : "Solo",
+      (r.members || []).map((m) => m.name).join("; "),
+      String(r.payment?.amount || 0),
+      r.payment?.method || "",
+      r.trxId || "",
+      r.created,
     ]);
     saveFile(
       "clubos-participants.csv",
-      [["Ticket", "Name", "Email", "Institution", "Event", "Status"], ...rows]
+      [
+        [
+          "Ticket",
+          "Name",
+          "Email",
+          "Institution",
+          "Event",
+          "Status",
+          "Team name",
+          "Entry type",
+          "Members",
+          "Amount BDT",
+          "Payment method",
+          "Trx ID",
+          "Registered at",
+        ],
+        ...rows,
+      ]
         .map((row) => row.map(safe).join(","))
         .join("\r\n"),
       "text/csv;charset=utf-8",
     );
-    toast.success(`${rows.length} participants exported`);
+    toast.success(`${rows.length} registration entries exported`);
   };
   return (
     <>
@@ -202,7 +243,7 @@ export default function OrganizerPanel({
         <div>
           <Users />
           <strong>{active.length}</strong>
-          <span>Active registrations</span>
+          <span>Reserved slots · one per entry</span>
         </div>
         <div>
           <Layers />
@@ -236,6 +277,39 @@ export default function OrganizerPanel({
         <TabsContent value="overview">
           {adminTab === "overview" && (
             <>
+              <section
+                className="payment-overview"
+                aria-label="Payment overview"
+              >
+                <div>
+                  <span className="eyebrow">PAYMENTS TO REVIEW</span>
+                  <strong>{pendingPayments.length} pending</strong>
+                  <p>
+                    ৳{pendingAmount.toLocaleString("en-BD")} submitted · verify
+                    Trx IDs before confirming.
+                  </p>
+                  <button
+                    className="primary"
+                    onClick={() => {
+                      setPStatus("pending_payment");
+                      setPEvent("all");
+                      setPQuery("");
+                      setAdminTab("participants");
+                    }}
+                  >
+                    Review payments
+                  </button>
+                </div>
+                <div>
+                  <span className="eyebrow">VERIFIED REGISTRATION FEES</span>
+                  <strong>৳{verifiedAmount.toLocaleString("en-BD")}</strong>
+                  <p>
+                    Confirmed and checked-in entries only. Uses the fee saved at
+                    booking, even if an event price changes later. Cancelled
+                    entries are excluded; this is not a refund ledger.
+                  </p>
+                </div>
+              </section>
               <div className="overview-grid">
                 <section className="white-panel">
                   <div className="panel-heading">
@@ -334,7 +408,7 @@ export default function OrganizerPanel({
                   <Search size={17} />
                   <input
                     aria-label="Search participants"
-                    placeholder="Name, email, institution, ticket…"
+                    placeholder="Name, team, member, Trx ID, ticket…"
                     value={pQuery}
                     onChange={(e) => setPQuery(e.target.value)}
                   />
@@ -472,7 +546,8 @@ export default function OrganizerPanel({
                   </div>
                 )}
                 <div className="table-count">
-                  {pRows.length} of {data.registrations.length} participants
+                  {pRows.length} of {data.registrations.length} registration
+                  entries · one row per solo or team booking
                 </div>
               </div>
             </>

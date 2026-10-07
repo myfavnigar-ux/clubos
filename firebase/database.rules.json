@@ -5,7 +5,7 @@
     "announcements": {
       ".read": true,
       "$id": {
-        ".write": "auth != null && auth.uid === 'LBRaxtFe2kg6tbke5adJqgLxKzZ2'",
+        ".write": "auth != null && (auth.uid === 'LBRaxtFe2kg6tbke5adJqgLxKzZ2' || auth.uid === 'EX6FflXRiWYJeERH0ziyBFM4Ss63')",
         ".validate": "newData.hasChildren(['title','body','priority','target','createdAt','updatedAt','expiresAt'])",
         "title": { ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 100" },
         "body": { ".validate": "newData.isString() && newData.val().length <= 1500" },

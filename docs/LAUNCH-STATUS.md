@@ -15,7 +15,7 @@ Updated October 8, 2026. Site: https://clubos-carnival-somudro.anaim12.chatgpt.s
 ## Firebase Console state
 
 - Email/Password is enabled and the production domain is authorized.
-- Owner supplied UID `LBRaxtFe2kg6tbke5adJqgLxKzZ2`; Sites server environment revision 2 preserves it and adds Web Push runtime credentials. Deploying applies that revision. Authorized admins do not need an additional app email-verification step.
+- Owner supplied UID `LBRaxtFe2kg6tbke5adJqgLxKzZ2`; Sites server environment revision 3 authorizes this UID and `EX6FflXRiWYJeERH0ziyBFM4Ss63`, and preserves Web Push runtime credentials. Revision 3 is deployed. Authorized admins do not need an additional app email-verification step.
 - Firestore Standard `(default)` database was created in `asia-southeast1`, initially locked. Restricted rules were published successfully after owner confirmation; the Console shows the new active rules revision.
 - Realtime Database is now confirmed provisioned in Singapore. Its exact Console URL, `https://clubosdrmc-default-rtdb.asia-southeast1.firebasedatabase.app`, is configured in the application. The supplied restricted rules have been published: announcements are public to read and writable only by the approved admin; notification read state is private to each account. The earlier Console provisioning errors no longer describe the current state.
 
@@ -34,3 +34,12 @@ See [Bengali setup instructions](FIREBASE-SETUP.md). Public source repository: h
 ## Team / payment / notification release
 
 Phone-at-signup, opt-in teammate search, invitation consent, team bookings, paid registrations, admin fee/payment controls and device push delivery are implemented. Server tests cover those flows. Web Push uses a secret VAPID key. **Automatic contest reminder scheduling is not enabled:** its authenticated MCP writer is published, but needs a connected unattended task. No physical-device delivery or real payment verification has been claimed. See [feature setup](TEAMS-PAYMENTS-NOTIFICATIONS.md).
+
+## Current polish and explicit limits
+
+- Shareable festival detail routes, festival breadcrumbs, filtered event counts and page-link copying.
+- Clear paused/full/deadline slot labels, including one slot per solo/team entry.
+- Organizer payment review queue, verified fee totals from booking snapshots, team/member/Trx search and expanded CSV.
+- Custom OTP and registration-confirmation emails were cancelled; their unfinished code was removed. No Firebase billing upgrade or email relay was activated for this work. Existing Auth verification/reset links remain.
+- The second organizer UID has server access. Matching Firestore/Realtime Database rule changes are prepared in the repository but not published; those live rules still authorize the original UID only. Browser publication awaits the requested action-time confirmation.
+- Judges still need a privately supplied organizer test account, and the official contest form still needs its actual URL and entrant details.
