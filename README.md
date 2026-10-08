@@ -2,6 +2,8 @@
 
 **Make your next move.** A student-club operations platform built for the Smart Club Operations theme at the 9th DRMC International Tech Carnival 2026 AI Web Development Contest.
 
+**Looking for the three test accounts? [Email and password table](#demo-credentials).**
+
 ## Project description
 
 ClubOS follows **Organization → Festival → Event → Registration**. Students discover festivals, explore events, register individually or with accepted teammates, and manage a personal schedule. Organizers create and edit festivals and events, manage participants, and check in ticket holders.
@@ -95,11 +97,19 @@ Sites manages the Worker, persistent D1 binding, schema migrations, and source-b
 
 ## Demo credentials
 
-The authorized admin signs in directly with email/password, without an app email-verification gate; students must verify before registration. There are no public admin credentials. Sign up with an email you control, verify it, and register for an event. The site owner must authorize a Firebase UID in the server environment variable `CLUBOS_ADMIN_UIDS` before that account can use the separate [organizer console](https://clubos-carnival-somudro.anaim12.chatgpt.site/admin). See [Firebase setup](docs/FIREBASE-SETUP.md). Provide judges a dedicated organizer account privately if required; never publish its password in this repository.
+Open **https://clubos-carnival-somudro.anaim12.chatgpt.site/judge-demo**.
 
-Twenty-four `@example.test` participants are preloaded for statistics and check-in examples. They do not belong to any real account. Design Beyond Screens is initially full and Campus Gaming Cup has an expired deadline. To demonstrate conflicts, register for AI Web Development and then Code Sprint using your own verified account.
+| Role | Public demo login | Public demo password |
+| --- | --- | --- |
+| Student | `student@clubos.demo` | `ClubOS-Judge-2026` |
+| Teammate | `partner@clubos.demo` | `ClubOS-Judge-2026` |
+| Organizer | `organizer@clubos.demo` | `ClubOS-Judge-2026` |
 
-The server verifies Firebase token signatures, audience, issuer, expiry, authentication time and current account state. It uses the verified UID for ownership and the server allowlist for admin permissions. Public responses expose seat counts, not participant details. Student responses include only their own individual/team registrations; teammates cannot read the leader’s payment transaction ID. The registration email always comes from Firebase rather than the request body.
+These intentionally public credentials unlock only an isolated browser-local sample workspace. They are not Firebase credentials and cannot authorize `/admin` or `/api/club`. No verification or 2FA is required for this demo. Registration, accepted team invitations, payment review, event/festival editing, check-in and CSV export are interactive; localStorage retains sample changes across reloads and account switches in the same browser. Reset demo restores fictional seed data. Dates shift forward when starting a fresh demo so judges can evaluate booking after the contest deadline. Design Beyond Screens starts full and Campus Gaming Cup starts closed.
+
+The demo uses a separate local data adapter, not the production backend. It does not validate production networking, live Firebase profiles/community writes or actual device push. Production remains Firebase-authenticated and database-backed; real users and records are not exposed by these credentials. Demo paid events say `DEMO-NO-PAYMENT`; do not transfer money or enter personal data. Cloud-only admin tabs are intentionally absent from the demo. The main website supports those features for authorized real accounts.
+
+See [the 5-minute judge walkthrough](docs/PUBLIC-JUDGE-DEMO.md) and [the copy-ready submission entry](docs/SUBMISSION.md). Final marks belong to the judges; rubric coverage is not a guaranteed score.
 
 ## Third-party services and APIs
 
@@ -159,19 +169,3 @@ shall be final.
 ## Latest contest polish
 
 Festival tiles open reloadable, shareable festival pages with dates, venues, artwork, open-event counts and event lists. Event pages link back to the festival. Admin Overview includes a pending-payment review queue and verified fee totals based on saved booking amounts. Participant search covers teams, members and Trx IDs; CSV includes team/payment details. Existing account verification links remain; custom email OTP and ticket emails are out of scope at the owner's request. See [judge guide](docs/JUDGE-GUIDE.md) for the walkthrough and remaining submission requirements.
-
-## Public judge credentials — no email verification or 2FA
-
-Open **https://clubos-carnival-somudro.anaim12.chatgpt.site/judge-demo**.
-
-| Role | Public demo login | Public demo password |
-| --- | --- | --- |
-| Student | `student@clubos.demo` | `ClubOS-Judge-2026` |
-| Teammate | `partner@clubos.demo` | `ClubOS-Judge-2026` |
-| Organizer | `organizer@clubos.demo` | `ClubOS-Judge-2026` |
-
-These intentionally public credentials unlock only an isolated browser-local sample workspace. They are not Firebase credentials and cannot authorize `/admin` or `/api/club`. No verification or 2FA is required for this demo. Registration, accepted team invitations, payment review, event/festival editing, check-in and CSV export are interactive; localStorage retains sample changes across reloads and account switches in the same browser. Reset demo restores fictional seed data. Dates shift forward when starting a fresh demo so judges can evaluate booking after the contest deadline. Design Beyond Screens starts full and Campus Gaming Cup starts closed.
-
-The demo uses a separate local data adapter, not the production backend. It does not validate production networking, live Firebase profiles/community writes or actual device push. Production remains Firebase-authenticated and database-backed; real users and records are not exposed by these credentials. Demo paid events say `DEMO-NO-PAYMENT`; do not transfer money or enter personal data. Cloud-only admin tabs are intentionally absent from the demo. The main website supports those features for authorized real accounts.
-
-See [the 5-minute judge walkthrough](docs/PUBLIC-JUDGE-DEMO.md) and [the copy-ready submission entry](docs/SUBMISSION.md). Final marks belong to the judges; rubric coverage is not a guaranteed score.
