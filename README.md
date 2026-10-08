@@ -21,7 +21,8 @@ This submission is a shared, database-backed club application with **Firebase Au
 - Solo/Team selector at the top of every registration form, with inline teammate search, invitation sending and accepted-member status.
 - Phone number at signup, opt-in teammate directory, collaboration invitations, group leaders/names, and shared team registration history.
 - Admin-managed BDT fees/payment numbers, preserved payment snapshots and pending-payment slot reservations.
-- Device push opt-in, service worker, invitation alerts and calendar alarms. Automatic 24-hour/1-hour reminders have an authenticated writer but await scheduler connection; see [setup and limits](docs/TEAMS-PAYMENTS-NOTIFICATIONS.md).
+- **Announcement system:** organizers publish campus updates from the admin panel; Firebase Realtime Database delivers them to the website's header notification bell, with important notices, optional expiry dates and links to relevant event/blog pages.
+- **Notification system:** an unread badge, saved announcement read state, Mark all as read, and actionable team invitations help students keep track of updates. Supported devices can opt in to Web Push; exported calendars include reminder alarms. Automatic 24-hour/1-hour push reminders still await scheduler connection; see [setup and limits](docs/TEAMS-PAYMENTS-NOTIFICATIONS.md).
 - Server-enforced deadlines, capacity and normalized-email duplicate prevention.
 - Atomic final-seat booking: concurrent requests cannot overbook an event.
 - My registrations, cancellation, ticket downloads, and persistent state after refresh.
@@ -51,7 +52,9 @@ The [rulebook coverage map](docs/RULEBOOK-COVERAGE.md) links each judging sectio
 - **Account-based access:** registrations follow a Firebase account across devices; only approved organizers can manage all participants.
 - Progressive-enhancement WebMCP search tool when the browser supports it.
 -  Helpline contact for fast support.
--  Announcmet system for giving updates
+- **Live campus announcement center:** organizers can publish schedule changes, event instructions and other updates without editing the website code. The header bell opens a single Campus updates panel, with unread counts, Important labels, Bangladesh-time timestamps and Open details links. Realtime Database subscriptions bring announcement changes into the app; expired notices are hidden when the panel renders. Signed-in students can mark announcements as read, with their read state saved privately to their account.
+- **Actionable collaboration notifications:** team invitations appear alongside campus updates and contribute to the notification badge. Students can accept or decline an invitation directly; only accepted teammates are included when the leader registers the group. This turns an update into a clear next action while preserving participant consent.
+- **Optional device alerts and portable reminders:** on supported browsers/devices, students can enable encrypted Web Push for invitation alerts, including when the website is not in the foreground, subject to browser/OS delivery policies. Calendar exports contain one-day and one-hour alarms for the user's calendar app. Automatic contest push reminders have a tested background writer, but scheduling is **not enabled yet**; announcement publication itself does not broadcast a device push. These live notification features are separate from the isolated browser-local judge demo. See [notification setup and current limits](docs/TEAMS-PAYMENTS-NOTIFICATIONS.md).
 -  Blogs for past event stroys and new ideas
 
 ## Tech stack
