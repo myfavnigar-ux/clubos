@@ -152,7 +152,7 @@ export default function ClubApp(props: { adminMode?: boolean }) {
     </AccountProvider>
   );
 }
-function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
+export function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
   const account = useAccount();
   const [accountOpen, setAccountOpen] = useState(false);
   const refreshVersion = useRef(0);
@@ -267,6 +267,10 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
       try {
         const next = decodeURIComponent(location.hash.slice(1)) || "discover";
         if (next === "organizer") {
+          if (account.demo) {
+            setRoute("discover");
+            return;
+          }
           location.replace("/admin");
           return;
         }
@@ -281,7 +285,10 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
   }, [refresh, adminMode]);
   const go = (r: string) => {
     if (adminMode) {
-      if (r !== "organizer") location.href = "/#" + r;
+      if (r !== "organizer") {
+        if (account.demo) void account.signOut();
+        else location.href = "/#" + r;
+      }
       return;
     }
     location.hash = r;
@@ -605,7 +612,11 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
           Skip to content
         </a>
         <Sidebar collapsible="none" className="side">
-          <a className="brand" href="/#discover" aria-label="ClubOS home">
+          <a
+            className="brand"
+            href={account.demo ? "/judge-demo#discover" : "/#discover"}
+            aria-label="ClubOS home"
+          >
             <span className="brand-mark">c</span>club<span>os</span>
             <sup>®</sup>
           </a>
@@ -676,11 +687,19 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
               </button>
             ))}
           </nav>
-          {adminMode && (
-            <a className="admin-return" href="/#discover">
-              Open student website
-            </a>
-          )}
+          {adminMode &&
+            (account.demo ? (
+              <button
+                className="admin-return"
+                onClick={() => account.signOut()}
+              >
+                Switch to student demo
+              </button>
+            ) : (
+              <a className="admin-return" href="/#discover">
+                Open student website
+              </a>
+            ))}
           <div className="side-bottom">
             <div className="side-note">
               <Ticket size={30} className="side-pass-icon" />
@@ -722,7 +741,7 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
               Workspace <span>/</span> <strong>{title}</strong>
             </div>
             <div className="top-right">
-              <NotificationBell go={go} />
+              {!account.demo && <NotificationBell go={go} />}
               <button
                 className="header-help"
                 aria-label="Open helpline"
@@ -762,7 +781,26 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                   go={go}
                 />
               )}
-              {route === "profile" && <ProfilePage data={data} go={go} />}
+              {route === "profile" &&
+                (account.demo ? (
+                  <section className="white-panel">
+                    <h1>Demo student profile</h1>
+                    <p>
+                      {account.user?.displayName} · {account.user?.email}
+                    </p>
+                    <p>
+                      Sample account only. Real private profiles use Firebase.
+                    </p>
+                    <button
+                      className="primary"
+                      onClick={() => go("registrations")}
+                    >
+                      View my registrations
+                    </button>
+                  </section>
+                ) : (
+                  <ProfilePage data={data} go={go} />
+                ))}
               {route === "support" && <SupportPage />}
             </Suspense>
             {(route === "discover" || (isFestPage && selectedFest)) && (
@@ -1169,7 +1207,7 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                             Capacity
                             <dd>
                               {counts(selectedEvent.id)} of{" "}
-                              {selectedEvent.capacity} seats reserved
+                              {selectedEvent.capacity} slots reserved
                             </dd>
                           </dt>
                         </div>
@@ -1186,7 +1224,7 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                           0,
                           selectedEvent.capacity - counts(selectedEvent.id),
                         )}{" "}
-                        seats available
+                        slots available
                       </p>
                       {myActive.some((r) => r.eventId === selectedEvent.id) ? (
                         <>
@@ -1240,7 +1278,7 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                           {availability(selectedEvent) === "Open"
                             ? "Register for this event"
                             : availability(selectedEvent) === "Full"
-                              ? "All seats reserved"
+                              ? "All slots reserved"
                               : availability(selectedEvent) === "Paused"
                                 ? "Registration paused"
                                 : "Registration closed"}
@@ -1254,8 +1292,10 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                         Add to calendar
                       </button>
                       <p className="fine-print">
-                        Confirmation is instant. Your ticket stays in My
-                        registrations.
+                        {selectedEvent.fee
+                          ? "Your ticket is confirmed after organizer payment review."
+                          : "Confirmation is instant."}{" "}
+                        Your ticket stays in My registrations.
                       </p>
                     </aside>
                   </div>
@@ -1515,6 +1555,7 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                 }
               >
                 <OrganizerPanel
+                  demo={!!account.demo}
                   data={data}
                   loading={loading}
                   error={error}
@@ -1559,6 +1600,9 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
             <footer>
               <span>Built for the people who make things happen.</span>
               <span>CLUBOS · DRMC IT CLUB</span>
+              {!account.demo && (
+                <a href="/judge-demo">Judge demo · no verification</a>
+              )}
             </footer>
           </div>
         </main>
@@ -1660,7 +1704,11 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                 name="institution"
                 label="School / college"
                 placeholder="Your institution"
-                defaultValue="Dhaka Residential Model College"
+                defaultValue={
+                  account.demo
+                    ? "Example College"
+                    : "Dhaka Residential Model College"
+                }
                 required
                 minLength={2}
                 maxLength={120}
@@ -1671,7 +1719,11 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                     PAYMENT · {register.paymentMethod}
                   </span>
                   <h3>{eventPrice(register, regMode)}</h3>
-                  <p>Send the fee to this receiving number:</p>
+                  <p>
+                    {account.demo
+                      ? "Demo only: do not send money. Enter a made-up Trx ID to test review."
+                      : "Send the fee to this receiving number:"}
+                  </p>
                   <strong className="payment-number">
                     {register.paymentNumber}
                   </strong>
@@ -1686,10 +1738,9 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                     placeholder="Enter the payment transaction ID"
                   />
                   <p className="fine-print">
-                    Check available slots before paying. Your slot is reserved
-                    after submission; the organizer confirms after checking the
-                    payment. Contact Helpline for corrections or refund
-                    questions.
+                    {account.demo
+                      ? "Use a fictional Trx ID. Switch to Organizer to test approval; no money is transferred."
+                      : "Check available slots before paying. Your slot is reserved after submission; the organizer confirms after checking the payment. Contact Helpline for corrections or refund questions."}
                   </p>
                 </div>
               )}
@@ -1736,7 +1787,9 @@ function ClubContent({ adminMode = false }: { adminMode?: boolean }) {
                 )}
               </button>
               <p className="fine-print">
-                Your registration is saved to your account. Download your pass
+                {account.demo
+                  ? "Your demo registration is saved in this browser. Download your sample pass"
+                  : "Your registration is saved to your account. Download your pass"}{" "}
                 after confirmation; ticket emails are not sent.
               </p>
             </form>

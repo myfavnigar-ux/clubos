@@ -11,7 +11,9 @@ import {
 import type { User } from "firebase/auth";
 import { Field } from "./club-controls";
 
-type AccountContext = {
+export type AccountContext = {
+  demo?: boolean;
+  transport?: (init: RequestInit) => Promise<Response>;
   user: User | null;
   ready: boolean;
   error: string;
@@ -21,6 +23,7 @@ type AccountContext = {
   reload: () => Promise<boolean>;
 };
 const Context = createContext<AccountContext | null>(null);
+export const DemoAccountProvider = Context.Provider;
 export const useAccount = () => useContext(Context)!;
 export function AccountProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -158,7 +161,32 @@ function message(error: unknown) {
     "That request could not be completed. Please try again."
   );
 }
-export function AccountPanel({
+export function AccountPanel(props: {
+  admin?: boolean;
+  authorizedAdmin?: boolean;
+  onDone?: () => void;
+}) {
+  const account = useAccount();
+  if (account.demo)
+    return (
+      <section className="account-panel">
+        <h2>Public judge demo</h2>
+        <p>{account.user?.email}</p>
+        <p>
+          No email verification or 2FA. This account only edits this browser's
+          sample data.
+        </p>
+        <button className="primary full" onClick={props.onDone}>
+          Continue demo
+        </button>
+        <button className="secondary full" onClick={account.signOut}>
+          Exit demo account
+        </button>
+      </section>
+    );
+  return <FirebaseAccountPanel {...props} />;
+}
+function FirebaseAccountPanel({
   admin = false,
   authorizedAdmin = false,
   onDone,

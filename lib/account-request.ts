@@ -10,6 +10,7 @@ export class AccountChangedError extends Error {
 // populate the next account's screen, including when sign-out happens in another tab.
 export async function accountRequest<T = unknown>(
   account: {
+    transport?: (init: RequestInit) => Promise<Response>;
     currentUid: () => string | null;
     headers: () => Promise<Record<string, string>>;
   },
@@ -21,7 +22,9 @@ export async function accountRequest<T = unknown>(
   const headers = new Headers(init.headers);
   for (const [name, value] of Object.entries(authHeaders))
     headers.set(name, value);
-  const response = await fetch("/api/club", { ...init, headers });
+  const response = account.transport
+    ? await account.transport({ ...init, headers })
+    : await fetch("/api/club", { ...init, headers });
   const data = (await response.json()) as T;
   if (uid !== account.currentUid()) throw new AccountChangedError();
   return { response, data };

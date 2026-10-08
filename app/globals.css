@@ -4345,3 +4345,116 @@ body {
     grid-template-columns: 1fr;
   }
 }
+.judge-login {
+  max-width: 1080px;
+  margin: auto;
+  padding: 50px 24px 80px;
+  color: #243d31;
+}
+.judge-login > .brand {
+  display: flex;
+  margin-bottom: 45px;
+}
+.judge-login h1 {
+  font-size: clamp(36px, 5vw, 60px);
+  line-height: 1.05;
+  letter-spacing: -2px;
+  margin: 16px 0 22px;
+}
+.judge-login > p:not(.eyebrow) {
+  max-width: 650px;
+  line-height: 1.7;
+  color: #536058;
+}
+.judge-login-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 30px;
+}
+.judge-login-grid h2 {
+  font-size: 23px;
+  margin: 0 0 20px;
+}
+.judge-access {
+  background: #f0ecff;
+}
+.judge-access code {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: 14px;
+  border-radius: 10px;
+  background: white;
+  color: #472b97;
+  font-size: 18px;
+  user-select: all;
+}
+.judge-access ol {
+  padding-left: 22px;
+  line-height: 1.8;
+  margin: 20px 0;
+}
+.judge-demo-banner {
+  background: #342462;
+  color: #fff;
+  padding: 14px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 50;
+}
+.judge-demo-banner > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.judge-demo-banner span {
+  font-size: 12px;
+  max-width: 560px;
+}
+.judge-demo-banner button,
+.judge-demo-banner a {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fff;
+  color: #342462;
+  font-size: 12px;
+  font-weight: 700;
+}
+.judge-demo-shell .app-shell {
+  min-height: calc(100vh - 85px);
+}
+.judge-demo-shell .side {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+@media (max-width: 700px) {
+  .judge-login {
+    padding: 28px 18px;
+  }
+  .judge-login-grid {
+    grid-template-columns: 1fr;
+  }
+  .judge-demo-shell .side {
+    position: fixed;
+    height: auto;
+  }
+  .judge-demo-banner {
+    padding: 14px;
+  }
+}
+
+.judge-demo-shell .app-shell > main {
+  margin-left: 0;
+}
+@media (max-width: 800px) {
+  .judge-demo-shell .side {
+    position: static;
+    height: auto;
+  }
+}

@@ -1,6 +1,6 @@
 # Judge walkthrough
 
-First complete [Firebase setup](FIREBASE-SETUP.md). Use a verified student account and a separately authorized organizer account. Never publish organizer passwords in the repository.
+For instant evaluation, use [the public judge demo](PUBLIC-JUDGE-DEMO.md): three public sample logins need no email verification or 2FA. They edit only this browser's fictional data. The walkthrough below also applies to the production app, where verified Firebase student accounts and authorized organizers are required. Public demo passwords do not grant production access.
 
 1. **Directory:** Show the five illustrated festival selectors. Select a festival to open its shareable `#fest/<id>` page; reload to demonstrate that the festival selection is preserved. Search “robot”, clear it, and select a category. Open Robotics Arena to show the event venue, time, deadline, capacity and registration form.
 2. **Registration:** Sign in with a verified account, then register using your name and institution. Show the instant ticket, download it, reload, then open My registrations. Open My schedule and export the calendar.
@@ -30,7 +30,8 @@ This maps implemented features to the rubric; it is not a claim of points earned
 - [x] Screenshots and demonstration guide
 - [x] Public access enabled for the deployed URL
 - [x] Create Firebase databases, publish restrictive rules for the original organizer and configure server admin access
-- [ ] Privately provide judges an organizer test account if required
+- [x] Provide public student/teammate/organizer demo credentials and an isolated walkthrough
+- [ ] Privately provide a real organizer test account if judges require production-backend validation
 - [x] Publish source at https://github.com/myfavnigar-ux/clubos
 - [x] Include the public repository URL in the submission documents
 - [ ] Submit the repository and deployment links through the official form

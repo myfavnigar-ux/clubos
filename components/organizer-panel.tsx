@@ -80,6 +80,7 @@ function Picker({
 }
 
 export default function OrganizerPanel({
+  demo = false,
   data,
   loading,
   error,
@@ -91,6 +92,7 @@ export default function OrganizerPanel({
   availability,
   refresh,
 }: {
+  demo?: boolean;
   data: Snapshot;
   loading: boolean;
   error: string;
@@ -233,10 +235,13 @@ export default function OrganizerPanel({
       <div className="demo-notice">
         <Sparkles size={17} />
         <span>
-          <strong>Shared organizer workspace.</strong> Registrations from all
-          student accounts appear here. Changes are saved for everyone. Refresh
-          to see the latest activity. Participant addresses ending in
-          @example.test are sample data.
+          <strong>
+            {demo ? "Isolated judge workspace." : "Shared organizer workspace."}
+          </strong>{" "}
+          {demo
+            ? "Only fictional registrations appear here; changes stay in this browser. "
+            : "Registrations from all student accounts appear here. Changes are saved for everyone. Refresh to see the latest activity. "}
+          Participant addresses ending in @example.test are sample data.
         </span>
       </div>
       <div className="mini-stats four">
@@ -269,10 +274,14 @@ export default function OrganizerPanel({
           <TabsTrigger value="participants">Participants</TabsTrigger>
           <TabsTrigger value="events">Event management</TabsTrigger>
           <TabsTrigger value="festivals">Festivals</TabsTrigger>
-          <TabsTrigger value="students">Student profiles</TabsTrigger>
-          <TabsTrigger value="announcements">Announcements</TabsTrigger>
-          <TabsTrigger value="blogs">Blogs</TabsTrigger>
-          <TabsTrigger value="support">Helpline</TabsTrigger>
+          {!demo && (
+            <>
+              <TabsTrigger value="students">Student profiles</TabsTrigger>
+              <TabsTrigger value="announcements">Announcements</TabsTrigger>
+              <TabsTrigger value="blogs">Blogs</TabsTrigger>
+              <TabsTrigger value="support">Helpline</TabsTrigger>
+            </>
+          )}
         </TabsList>
         <TabsContent value="overview">
           {adminTab === "overview" && (
@@ -661,19 +670,52 @@ export default function OrganizerPanel({
           )}
         </TabsContent>
         <TabsContent value="students">
-          {adminTab === "students" && <StudentDirectory data={data} />}
+          {!demo && adminTab === "students" && <StudentDirectory data={data} />}
         </TabsContent>
         {(["blogs", "announcements", "support"] as const).map((kind) => (
           <TabsContent key={kind} value={kind}>
-            {adminTab === kind && <CommunityManager kind={kind} data={data} />}
+            {!demo && adminTab === kind && (
+              <CommunityManager kind={kind} data={data} />
+            )}
           </TabsContent>
         ))}
       </Tabs>
-      <RegistrationInspector
-        registration={inspect}
-        data={data}
-        onClose={() => setInspect(null)}
-      />
+      {demo ? (
+        <Dialog
+          open={!!inspect}
+          onOpenChange={(v) => {
+            if (!v) setInspect(null);
+          }}
+        >
+          <DialogContent className="club-dialog">
+            <DialogTitle>{inspect?.name}</DialogTitle>
+            <DialogDescription>
+              Fictional participant · isolated public demo
+            </DialogDescription>
+            <p>{inspect?.email}</p>
+            <p>{inspect?.institution}</p>
+            <p>Team: {inspect?.teamName || "Solo"}</p>
+            <p>
+              Members:{" "}
+              {inspect?.members?.map((m) => m.name).join(", ") || inspect?.name}
+            </p>
+            <p>Trx ID: {inspect?.trxId || "Free entry"}</p>
+            <p>
+              Registrations in this demo:{" "}
+              {
+                data.registrations.filter((r) => r.email === inspect?.email)
+                  .length
+              }
+            </p>
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <RegistrationInspector
+          registration={inspect}
+          data={data}
+          onClose={() => setInspect(null)}
+        />
+      )}
       <Dialog
         open={!!edit}
         onOpenChange={(v) => {

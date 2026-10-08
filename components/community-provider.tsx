@@ -23,7 +23,32 @@ type Community = {
 };
 const Context = createContext<Community | null>(null);
 export const useCommunity = () => useContext(Context)!;
-export function CommunityProvider({
+export function CommunityProvider(props: {
+  admin: boolean;
+  children: ReactNode;
+}) {
+  const account = useAccount();
+  if (account.demo)
+    return (
+      <Context.Provider
+        value={{
+          blogs: sampleBlogs,
+          announcements: [],
+          support: sampleSupport,
+          error: "",
+          noticeError: "",
+          loading: false,
+          sample: true,
+          seen: 0,
+          markAllRead: async () => {},
+        }}
+      >
+        {props.children}
+      </Context.Provider>
+    );
+  return <FirebaseCommunityProvider {...props} />;
+}
+function FirebaseCommunityProvider({
   admin,
   children,
 }: {

@@ -43,3 +43,7 @@ Phone-at-signup, opt-in teammate search, invitation consent, team bookings, paid
 - Custom OTP and registration-confirmation emails were cancelled; their unfinished code was removed. No Firebase billing upgrade or email relay was activated for this work. Existing Auth verification/reset links remain.
 - The second organizer UID has server access. Matching Firestore/Realtime Database rule changes are prepared in the repository but not published; those live rules still authorize the original UID only. Browser publication awaits the requested action-time confirmation.
 - Judges still need a privately supplied organizer test account, and the official contest form still needs its actual URL and entrant details.
+
+## Public judge demo
+
+`/judge-demo` offers public student, teammate and organizer credentials documented in README and PUBLIC-JUDGE-DEMO.md. It needs no verification or 2FA and stores only fictional evaluation data in the browser. It shares the production UI, with an explicit local data adapter; it makes no authenticated Firebase or production API calls. Production permissions are unchanged. Public demo credentials satisfy immediate UI/workflow evaluation, but are not evidence of real Firebase write testing. The official submission form is still pending; the owner said they will provide it later.

@@ -24,3 +24,7 @@ These are coverage notes, not awarded scores. Creative marks and the final resul
 ## Demonstration scope
 
 Firebase accounts identify students; a server UID allowlist authorizes organizers. Shared D1 storage powers registration and the catalog. The supplied organizer UID is configured. Profiles, blogs and announcements use the provisioned Firebase databases; live account walkthrough and second-admin rules status are documented in LAUNCH-STATUS.md. See FIREBASE-SETUP.md. The sample events and illustrations do not represent official DRMC event registrations or photographs.
+
+## Immediate evaluator access
+
+Public credentials and limitations are in PUBLIC-JUDGE-DEMO.md and README. Core workflows are available without email verification or 2FA in an isolated local demo. Demo editing does not change production data. The actual server/API remains protected and its signed-token integration tests cover real handler behavior with simulated Google authentication.

@@ -47,11 +47,18 @@ React 19, TypeScript, Vinext/Vite, Cloudflare Workers, Cloudflare D1/SQLite, Fir
 ## AI tools and disclosure
 OpenAI Codex assisted with rulebook analysis, planning, implementation, styling, test creation, and debugging. Code, sample content, and original illustrations were generated with AI assistance. See AI-ART-PROMPTS.md for the exact image prompts. The running application does not call an AI model. Search, statistics, conflict detection, and schedule suggestions are deterministic. WebMCP is optional browser-agent integration.
 
-## Demo access
-Open the live URL for discovery. Create an account with an email you control and verify it before registering. Complete FIREBASE-SETUP.md first. For organizer evaluation, the owner must privately provide an account whose UID is authorized on the server. No public admin password is included.
+## Demo access — no email verification or 2FA
+Public demo: https://clubos-carnival-somudro.anaim12.chatgpt.site/judge-demo
+
+- Student: `student@clubos.demo`
+- Teammate: `partner@clubos.demo`
+- Organizer: `organizer@clubos.demo`
+- Password for all three: `ClubOS-Judge-2026`
+
+These are intentionally public evaluation logins for a browser-local sample workspace. They cannot sign in to Firebase or the production admin. Changes persist across reload/account switches in the same browser and can be reset. The demo supports directory, individual/team registration, invitation consent, payment review, event/festival editing, status changes, ticket check-in and CSV. No real payments, private profiles, cloud community edits or device notifications run in this demo. The production application uses the live authenticated backend described above.
 
 ## Judge walkthrough
-Follow JUDGE-GUIDE.md. The student URL is the main deployment; organizer tools are at `/admin`.
+Follow JUDGE-GUIDE.md. For an immediate evaluation, use `/judge-demo` and follow PUBLIC-JUDGE-DEMO.md. Real organizer tools remain at `/admin`.
 
 ## Verification
 TypeScript and production build checks pass. The Firebase test harness runs the real API and JWT verification against signed test tokens, simulated Google responses and SQLite; no real Firebase users are created. The admin UID is configured. Live sign-in/email and community storage checks still require the remaining steps in LAUNCH-STATUS.md. See DELIVERY.md for scope.
