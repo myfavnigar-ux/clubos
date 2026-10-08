@@ -50,6 +50,9 @@ The [rulebook coverage map](docs/RULEBOOK-COVERAGE.md) links each judging sectio
 - **Useful data export:** filtered participant CSV with spreadsheet-formula injection protection.
 - **Account-based access:** registrations follow a Firebase account across devices; only approved organizers can manage all participants.
 - Progressive-enhancement WebMCP search tool when the browser supports it.
+-  Helpline contact for fast support.
+-  Announcmet system for giving updates
+-  Blogs for past event stroys and new ideas
 
 ## Tech stack
 
@@ -57,6 +60,19 @@ React 19, TypeScript, Vinext / Vite, Cloudflare Workers, Cloudflare D1 (SQLite),
 
 ## Setup instructions
 
+In app setup 
+- Open the website
+- Select a event
+- Create account
+- Register team or solo by fill up details
+- Use /admin in the URL to go to the admin and checkout details
+
+Event  creation
+-Select event mangement in admin page just under the active registation
+-Enter detail 
+-Save details
+
+App Bulid setup 
 Requirements: Node.js 24 (for the SQLite test harness), npm, Git, and the configured Firebase project. Follow [the console guide](docs/FIREBASE-SETUP.md) to enable Email/Password, authorize the domain, verify an account and authorize the organizer UID. D1 is authoritative for festivals, events, registrations and seat counts. Firestore stores student profiles, blogs and helpline contacts; Realtime Database stores announcements and notification read state.
 
 ```sh
